@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- Meta descrição persuasiva (até 160 caracteres) -->
+    <meta name="description"
+        content="API gratuita e ferramenta online para gerar QR Codes PIX estáticos. Gere pagamentos PIX em segundos com nossa interface web ou integre via API REST.">
+    <!-- URL canônica evita conteúdo duplicado -->
+    <link rel="canonical" href="{{ request.host_url.rstrip('/') }}">
+        <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <title>Erro Interno - API PIX</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="error-page">
+            <div class="error-icon" style="color: #e74c3c;">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h1>500 - Erro Interno do Servidor</h1>
+            <p class="error-message">
+                Ocorreu um erro inesperado no servidor. Nossa equipe foi notificada.
+            </p>
+            
+            {% if debug and error %}
+            <div class="error-details debug-info">
+                <h3><i class="fas fa-bug"></i> Informações de Debug (apenas em desenvolvimento):</h3>
+                <pre><code>{{ error }}</code></pre>
+            </div>
+            {% endif %}
+            
+            <div class="suggestions">
+                <h3><i class="fas fa-tools"></i> O que você pode fazer:</h3>
+                <ul>
+                    <li>Tente novamente em alguns instantes</li>
+                    <li>Verifique se todos os campos foram preenchidos corretamente</li>
+                    <li>Se o problema persistir, entre em contato com o suporte</li>
+                </ul>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="javascript:history.back()" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Página Inicial
+                </a>
+                <a href="/generate" class="btn btn-outline">
+                    <i class="fas fa-redo"></i> Tentar Novamente
+                </a>
+            </div>
+            
+            <div class="contact-support">
+                <h4><i class="fas fa-headset"></i> Precisa de ajuda?</h4>
+                <p>Se o erro persistir, entre em contato com nosso suporte técnico.</p>
+                <div class="contact-info">
+                    <p><i class="fas fa-envelope"></i> suporte@exemplo.com</p>
+                    <p><i class="fas fa-phone"></i> (11) 99999-9999</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <p>API PIX QR Code Generator &copy; Snake Project 2026 - Página de erro 500</p>
+            <p class="timestamp"><i class="fas fa-clock"></i> Erro registrado em: {{ now.strftime('%d/%m/%Y %H:%M:%S') if now else '' }}</p>
+        </footer>
+    </div>
+</body>
+</html>

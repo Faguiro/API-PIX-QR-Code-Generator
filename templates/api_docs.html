@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- Meta descrição persuasiva (até 160 caracteres) -->
+    <meta name="description"
+        content="API gratuita e ferramenta online para gerar QR Codes PIX estáticos. Gere pagamentos PIX em segundos com nossa interface web ou integre via API REST.">
+    <!-- URL canônica evita conteúdo duplicado -->
+    <link rel="canonical" href="{{ request.host_url.rstrip('/') }}">
+        <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <title>Documentação da API - PIX QR Code</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-book"></i> Documentação da API</h1>
+            <p class="subtitle">Endpoints e exemplos para integração</p>
+            <div class="header-actions">
+                <a href="/" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+                <a href="/generate" class="btn btn-primary">
+                    <i class="fas fa-qrcode"></i> Testar API
+                </a>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="docs-sidebar">
+                <nav class="docs-nav">
+                    <h3><i class="fas fa-bars"></i> Navegação</h3>
+                    <ul>
+                        <li><a href="#introduction"><i class="fas fa-info-circle"></i> Introdução</a></li>
+                        <li><a href="#authentication"><i class="fas fa-key"></i> Autenticação</a></li>
+                        <li><a href="#endpoints"><i class="fas fa-plug"></i> Endpoints</a></li>
+                        <li><a href="#generate-pix"><i class="fas fa-qrcode"></i> Gerar PIX</a></li>
+                        <li><a href="#validate"><i class="fas fa-check-circle"></i> Validar</a></li>
+                        <li><a href="#download"><i class="fas fa-download"></i> Download</a></li>
+                        <li><a href="#examples"><i class="fas fa-code"></i> Exemplos</a></li>
+                        <li><a href="#errors"><i class="fas fa-exclamation-triangle"></i> Erros</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="docs-content">
+                <section id="introduction" class="docs-section">
+                    <h2><i class="fas fa-info-circle"></i> Introdução</h2>
+                    <p>A API PIX QR Code Generator permite a geração de QR Codes para pagamentos PIX estáticos através de uma interface RESTful.</p>
+                    
+                    <div class="info-box">
+                        <h4><i class="fas fa-lightbulb"></i> URL Base</h4>
+                        <code>{{ request.host_url }}api/v1/</code>
+                    </div>
+
+                    <div class="info-box">
+                        <h4><i class="fas fa-exchange-alt"></i> Formato das Respostas</h4>
+                        <p>Todas as respostas são em formato JSON com código HTTP apropriado.</p>
+                    </div>
+                </section>
+
+                <section id="authentication" class="docs-section">
+                    <h2><i class="fas fa-key"></i> Autenticação</h2>
+                    <p>Atualmente a API não requer autenticação para endpoints públicos. Para ambientes de produção, recomenda-se implementar API Keys.</p>
+                    
+                    <div class="code-example">
+                        <h4>Exemplo com API Key (Futuro):</h4>
+                        <pre><code class="language-http">
+GET /api/v1/pix/generate
+Authorization: Bearer sua-api-key-aqui
+Content-Type: application/json
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section id="endpoints" class="docs-section">
+                    <h2><i class="fas fa-plug"></i> Endpoints Disponíveis</h2>
+                    
+                    <table class="endpoints-table">
+                        <thead>
+                            <tr>
+                                <th>Método</th>
+                                <th>Endpoint</th>
+                                <th>Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="method get">GET</span></td>
+                                <td><code>/api/v1/health</code></td>
+                                <td>Verifica saúde da API</td>
+                            </tr>
+                            <tr>
+                                <td><span class="method post">POST</span></td>
+                                <td><code>/api/v1/pix/generate</code></td>
+                                <td>Gera QR Code PIX</td>
+                            </tr>
+                            <tr>
+                                <td><span class="method post">POST</span></td>
+                                <td><code>/api/v1/pix/validate</code></td>
+                                <td>Valida payload PIX</td>
+                            </tr>
+                            <tr>
+                                <td><span class="method get">GET</span></td>
+                                <td><code>/api/v1/pix/download/:filename</code></td>
+                                <td>Download de QR Code</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section id="generate-pix" class="docs-section">
+                    <h2><i class="fas fa-qrcode"></i> Gerar QR Code PIX</h2>
+                    <p>Endpoint principal para geração de QR Codes PIX.</p>
+                    
+                    <div class="endpoint-info">
+                        <h4><span class="method post">POST</span> <code>/api/v1/pix/generate</code></h4>
+                        <p>Gera um QR Code PIX estático com os dados fornecidos.</p>
+                    </div>
+
+                    <h5>Parâmetros (JSON):</h5>
+                    <table class="params-table">
+                        <thead>
+                            <tr>
+                                <th>Parâmetro</th>
+                                <th>Tipo</th>
+                                <th>Obrigatório</th>
+                                <th>Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>nome</code></td>
+                                <td>String</td>
+                                <td>Sim</td>
+                                <td>Nome do recebedor (max 25 chars)</td>
+                            </tr>
+                            <tr>
+                                <td><code>chavepix</code></td>
+                                <td>String</td>
+                                <td>Sim</td>
+                                <td>Chave PIX (CPF, CNPJ, telefone, email)</td>
+                            </tr>
+                            <tr>
+                                <td><code>valor</code></td>
+                                <td>String</td>
+                                <td>Sim</td>
+                                <td>Valor da transação (ex: "150.50")</td>
+                            </tr>
+                            <tr>
+                                <td><code>cidade</code></td>
+                                <td>String</td>
+                                <td>Sim</td>
+                                <td>Cidade do recebedor (max 15 chars)</td>
+                            </tr>
+                            <tr>
+                                <td><code>txid</code></td>
+                                <td>String</td>
+                                <td>Não</td>
+                                <td>Identificador da transação</td>
+                            </tr>
+                            <tr>
+                                <td><code>return_image</code></td>
+                                <td>Boolean</td>
+                                <td>Não</td>
+                                <td>Retornar imagem do QR Code (default: false)</td>
+                            </tr>
+                            <tr>
+                                <td><code>image_format</code></td>
+                                <td>String</td>
+                                <td>Não</td>
+                                <td>"base64" ou "url" (default: "base64")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="code-example">
+                        <h4>Exemplo de Requisição:</h4>
+                        <pre><code class="language-json">
+{
+    "nome": "João Silva",
+    "chavepix": "joao.silva@email.com",
+    "valor": "150.50",
+    "cidade": "São Paulo",
+    "txid": "PEDIDO123",
+    "return_image": true,
+    "image_format": "base64"
+}
+                        </code></pre>
+                    </div>
+
+                    <div class="code-example">
+                        <h4>Exemplo de Resposta (Sucesso):</h4>
+                        <pre><code class="language-json">
+{
+    "success": true,
+    "payload": "00020126580014BR.GOV.BCB.PIX...",
+    "data": {
+        "nome": "João Silva",
+        "chavepix": "joao.silva@email.com",
+        "valor": "150.50",
+        "cidade": "São Paulo",
+        "txid": "PEDIDO123",
+        "timestamp": "2023-10-01T15:30:00"
+    },
+    "qr_code": {
+        "format": "base64",
+        "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...",
+        "mime_type": "image/png"
+    }
+}
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section id="validate" class="docs-section">
+                    <h2><i class="fas fa-check-circle"></i> Validar Payload</h2>
+                    <p>Valida um payload PIX existente.</p>
+                    
+                    <div class="endpoint-info">
+                        <h4><span class="method post">POST</span> <code>/api/v1/pix/validate</code></h4>
+                        <p>Valida a estrutura e checksum de um payload PIX.</p>
+                    </div>
+
+                    <div class="code-example">
+                        <h4>Exemplo de Requisição:</h4>
+                        <pre><code class="language-json">
+{
+    "payload": "00020126580014BR.GOV.BCB.PIX..."
+}
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section id="download" class="docs-section">
+                    <h2><i class="fas fa-download"></i> Download de QR Code</h2>
+                    <p>Baixa um QR Code previamente gerado.</p>
+                    
+                    <div class="endpoint-info">
+                        <h4><span class="method get">GET</span> <code>/api/v1/pix/download/:filename</code></h4>
+                        <p>Retorna a imagem PNG do QR Code.</p>
+                    </div>
+                </section>
+
+                <section id="examples" class="docs-section">
+                    <h2><i class="fas fa-code"></i> Exemplos de Uso</h2>
+                    
+                    <div class="code-example">
+                        <h4>Python com requests:</h4>
+                        <pre><code class="language-python">
+import requests
+import json
+
+url = "{{ request.host_url }}api/v1/pix/generate"
+payload = {
+    "nome": "Maria Santos",
+    "chavepix": "11999999999",
+    "valor": "99.90",
+    "cidade": "Rio de Janeiro",
+    "return_image": True
+}
+
+response = requests.post(url, json=payload)
+data = response.json()
+
+if data["success"]:
+    print(f"Payload: {data['payload'][:50]}...")
+    # Para base64, use data['qr_code']['data']
+else:
+    print(f"Erro: {data['error']}")
+                        </code></pre>
+                    </div>
+
+                    <div class="code-example">
+                        <h4>JavaScript com fetch:</h4>
+                        <pre><code class="language-javascript">
+async function generatePIX() {
+    const response = await fetch('{{ request.host_url }}api/v1/pix/generate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            nome: 'Carlos Oliveira',
+            chavepix: 'carlos@empresa.com',
+            valor: '250.75',
+            cidade: 'Belo Horizonte',
+            return_image: true
+        })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+        // Exibir QR Code
+        const img = document.createElement('img');
+        img.src = data.qr_code.data;
+        document.body.appendChild(img);
+    } else {
+        console.error('Erro:', data.error);
+    }
+}
+                        </code></pre>
+                    </div>
+
+                    <div class="code-example">
+                        <h4>cURL:</h4>
+                        <pre><code class="language-bash">
+curl -X POST "{{ request.host_url }}api/v1/pix/generate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Teste API",
+    "chavepix": "teste@email.com",
+    "valor": "1.00",
+    "cidade": "São Paulo"
+  }'
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section id="errors" class="docs-section">
+                    <h2><i class="fas fa-exclamation-triangle"></i> Códigos de Erro</h2>
+                    
+                    <table class="errors-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>400</td>
+                                <td>Requisição mal formada ou parâmetros inválidos</td>
+                            </tr>
+                            <tr>
+                                <td>404</td>
+                                <td>Endpoint não encontrado</td>
+                            </tr>
+                            <tr>
+                                <td>500</td>
+                                <td>Erro interno do servidor</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="code-example">
+                        <h4>Exemplo de Resposta de Erro:</h4>
+                        <pre><code class="language-json">
+{
+    "success": false,
+    "error": "Campo 'nome' é obrigatório"
+}
+                        </code></pre>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>API PIX QR Code Generator &copy; Snake Project 2026 - Documentação</p>
+            <div class="footer-links">
+                <a href="/"><i class="fas fa-home"></i> Início</a>
+                <a href="/generate"><i class="fas fa-qrcode"></i> Testar</a>
+                <a href="https://github.com/seu-usuario/pix-api" target="_blank">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

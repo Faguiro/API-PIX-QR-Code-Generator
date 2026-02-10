@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- Meta descrição persuasiva (até 160 caracteres) -->
+    <meta name="description"
+        content="API gratuita e ferramenta online para gerar QR Codes PIX estáticos. Gere pagamentos PIX em segundos com nossa interface web ou integre via API REST.">
+    <!-- URL canônica evita conteúdo duplicado -->
+    <link rel="canonical" href="{{ request.host_url.rstrip('/') }}">
+        <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <title>Gerar PIX - API QR Code</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-qrcode"></i> Gerar QR Code PIX</h1>
+            <p class="subtitle">Preencha os dados para gerar um QR Code PIX estático</p>
+            <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> Voltar</a>
+        </header>
+
+        <main class="main-content">
+            {% if error %}
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-triangle"></i> {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST" class="pix-form">
+                <div class="form-group">
+                    <label for="nome">
+                        <i class="fas fa-user"></i> Nome do Recebedor *
+                    </label>
+                    <input type="text" id="nome" name="nome" required 
+                           placeholder="Ex: João da Silva" maxlength="25">
+                    <small class="form-help">Máximo 25 caracteres</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="chavepix">
+                        <i class="fas fa-key"></i> Chave PIX *
+                    </label>
+                    <input type="text" id="chavepix" name="chavepix" required 
+                           placeholder="CPF, CNPJ, telefone ou email">
+                    <small class="form-help">Ex: 123.456.789-00, joao@email.com, +5511999999999</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="valor">
+                        <i class="fas fa-money-bill-wave"></i> Valor (R$) *
+                    </label>
+                    <input type="text" id="valor" name="valor" required 
+                           placeholder="Ex: 150.50" value="1.00">
+                    <small class="form-help">Use ponto como separador decimal (ex: 10.50)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="cidade">
+                        <i class="fas fa-city"></i> Cidade *
+                    </label>
+                    <input type="text" id="cidade" name="cidade" required 
+                           placeholder="Ex: São Paulo" maxlength="15">
+                    <small class="form-help">Máximo 15 caracteres</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="txid">
+                        <i class="fas fa-hashtag"></i> Identificador (TXID)
+                    </label>
+                    <input type="text" id="txid" name="txid" 
+                           placeholder="Ex: PEDIDO001, NOTA123">
+                    <small class="form-help">Opcional - Identificador da transação</small>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" name="return_base64" value="true">
+                        Retornar QR Code em base64
+                    </label>
+                    <small class="form-help">Útil para exibir diretamente no navegador</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-bolt"></i> Gerar PIX
+                    </button>
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> Limpar
+                    </button>
+                </div>
+            </form>
+
+            <div class="api-info">
+                <h3><i class="fas fa-code"></i> Uso via API</h3>
+                <p>Você também pode gerar QR Codes via API REST:</p>
+                <pre><code>
+POST /api/v1/pix/generate
+Content-Type: application/json
+
+{
+    "nome": "João Silva",
+    "chavepix": "joao@email.com",
+    "valor": "150.50",
+    "cidade": "São Paulo"
+}
+                </code></pre>
+                <a href="/api/docs" class="btn btn-outline">
+                    <i class="fas fa-book"></i> Ver Documentação Completa
+                </a>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>API PIX QR Code Generator &copy; Snake Project 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        // Validação básica no cliente
+        document.querySelector('.pix-form').addEventListener('submit', function(e) {
+            const valor = document.getElementById('valor').value;
+            
+            // Validar formato do valor
+            if (!/^\d+(\.\d{1,2})?$/.test(valor)) {
+                alert('Por favor, insira um valor válido (ex: 10.50)');
+                e.preventDefault();
+                return false;
+            }
+            
+            // Validar valor mínimo
+            const valorNum = parseFloat(valor);
+            if (valorNum <= 0) {
+                alert('O valor deve ser maior que zero');
+                e.preventDefault();
+                return false;
+            }
+            
+            return true;
+        });
+    </script>
+</body>
+</html>

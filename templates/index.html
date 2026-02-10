@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- Meta descrição persuasiva (até 160 caracteres) -->
+    <meta name="description"
+        content="API gratuita e ferramenta online para gerar QR Codes PIX estáticos. Gere pagamentos PIX em segundos com nossa interface web ou integre via API REST.">
+    <!-- URL canônica evita conteúdo duplicado -->
+    <link rel="canonical" href="{{ request.host_url.rstrip('/') }}">
+    <meta property="og:title" content="Gerador de QR Code PIX Gratuito">
+    <meta property="og:description"
+        content="Gere QR Codes PIX para pagamentos instantâneos. Ferramenta 100% online e gratuita.">
+    <meta property="og:image" content="{{ url_for('static', filename='img/og-pix-image.png', _external=True) }}">
+    <meta property="og:url" content="{{ request.host_url.rstrip('/') }}">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <title>API PIX QR Code Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-qrcode"></i> API PIX QR Code Generator</h1>
+            <p class="subtitle">Gere QR Codes PIX estáticos através de API REST</p>
+        </header>
+
+        <main class="main-content">
+            <div class="cards-container">
+                <div class="card">
+                    <div class="card-icon" style="background-color: #3498db;">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>API REST</h3>
+                    <p>Endpoints RESTful para integração com seu sistema</p>
+                    <a href="/api/docs" class="btn">Ver Documentação</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon" style="background-color: #2ecc71;">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3>Interface Web</h3>
+                    <p>Formulário web para geração rápida de QR Codes</p>
+                    <a href="/generate" class="btn">Usar Formulário</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon" style="background-color: #9b59b6;">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3>Download</h3>
+                    <p>Baixe QR Codes em formato PNG ou obtenha base64</p>
+                    <a href="#features" class="btn">Ver Recursos</a>
+                </div>
+            </div>
+
+            <section id="features" class="features">
+                <h2><i class="fas fa-star"></i> Recursos da API</h2>
+                <div class="features-grid">
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <h4>PIX Estático</h4>
+                        <p>Geração de QR Codes para pagamentos PIX estáticos</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Validação</h4>
+                        <p>Validação automática de payloads PIX</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-bolt"></i>
+                        <h4>Rápido</h4>
+                        <p>Geração instantânea de QR Codes</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-code"></i>
+                        <h4>JSON API</h4>
+                        <p>Respostas em formato JSON para integração</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="quick-start">
+                <h2><i class="fas fa-rocket"></i> Comece Agora</h2>
+                <div class="code-example">
+                    <h4>Exemplo de requisição:</h4>
+                    <pre><code>
+                // POST /api/v1/pix/generate
+                {
+                    "nome": "João Silva",
+                    "chavepix": "joao.silva@email.com",
+                    "valor": "150.50",
+                    "cidade": "São Paulo",
+                    "txid": "PEDIDO123",
+                    "return_image": true
+                }
+                    </code></pre>
+                </div>
+
+                <div class="code-example">
+                    <h4>Exemplo de resposta:</h4>
+                    <pre><code>
+                {
+                    "success": true,
+                    "payload": "00020126580014BR.GOV.BCB.PIX...",
+                    "qr_code": {
+                        "format": "base64",
+                        "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg..."
+                    }
+                }
+                    </code></pre>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>API PIX QR Code Generator &copy; Snake Project 2026</p>
+            <div class="footer-links">
+                <a href="/api/docs"><i class="fas fa-book"></i> Documentação</a>
+                <a href="/generate"><i class="fas fa-qrcode"></i> Gerar PIX</a>
+                <a href="/api/v1/health"><i class="fas fa-heartbeat"></i> Saúde da API</a>
+            </div>
+        </footer>
+    </div>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Gerador de QR Code PIX",
+  "url": "{{ request.host_url.rstrip('/') }}",
+  "description": "Ferramenta online gratuita para geração de QR Codes para pagamentos via PIX.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "BRL"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "Snake Project"
+  }
+}
+</script>
+</body>
+
+</html>

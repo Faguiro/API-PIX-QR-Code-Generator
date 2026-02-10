@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- Meta descrição persuasiva (até 160 caracteres) -->
+   
+    <!-- URL canônica evita conteúdo duplicado -->
+    <link rel="canonical" href="{{ request.host_url.rstrip('/') }}">
+     <meta property="og:title" content="Gerador de QR Code PIX Gratuito">
+    <meta property="og:description"
+        content="Gere QR Codes PIX para pagamentos instantâneos. Ferramenta 100% online e gratuita.">
+    <meta property="og:image" content="{{ url_for('static', filename='img/og-pix-image.png', _external=True) }}">
+    <meta property="og:url" content="{{ request.host_url.rstrip('/') }}">
+    <meta property="og:type" content="website">
+        <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+   <title>Gerar QR Code PIX | Valor: R$ {{ valor|default('1.00') }} | API PIX</title>
+<meta name="description" content="Gerando QR Code PIX no valor de R$ {{ valor|default('1.00') }} para {{ nome|default('pagamento') }}. Código PIX copia-e-cola e imagem prontos.">
+<!-- URL canônica para a página de geração -->
+<link rel="canonical" href="{{ request.host_url.rstrip('/') }}{{ request.path }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-check-circle"></i> QR Code Gerado com Sucesso!</h1>
+            <p class="subtitle">Seu código PIX está pronto para uso</p>
+            <div class="header-actions">
+                <a href="/generate" class="btn btn-secondary">
+                    <i class="fas fa-plus"></i> Gerar Novo
+                </a>
+                <a href="/" class="btn btn-outline">
+                    <i class="fas fa-home"></i> Início
+                </a>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="result-container">
+                <div class="qr-section">
+                    <h3><i class="fas fa-qrcode"></i> QR Code PIX</h3>
+                    <div class="qr-display" id="qrcode-display">
+                        {% if qr_base64 %}
+                            <img src="data:image/png;base64,{{ qr_base64 }}" 
+                                 alt="QR Code PIX" class="qr-image">
+                        {% else %}
+                            <img src="{{ qr_image }}" 
+                                 alt="QR Code PIX" class="qr-image">
+                        {% endif %}
+                    </div>
+                    
+                    <div class="qr-actions">
+                        <button onclick="downloadQRCode()" class="btn btn-primary">
+                            <i class="fas fa-download"></i> Baixar QR Code
+                        </button>
+                        <button onclick="copyPayload()" class="btn btn-secondary">
+                            <i class="fas fa-copy"></i> Copiar Código
+                        </button>
+                        <button onclick="shareQRCode()" class="btn btn-success">
+                            <i class="fas fa-share-alt"></i> Compartilhar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="payload-section">
+                    <h3><i class="fas fa-code"></i> Código PIX (Payload)</h3>
+                    <div class="payload-display">
+                        <textarea id="payload-text" readonly class="payload-textarea">{{ payload }}</textarea>
+                        <small class="payload-info">
+                            <i class="fas fa-info-circle"></i> 
+                            Este é o código copia-e-cola do PIX
+                        </small>
+                    </div>
+
+                    <div class="payload-info-card">
+                        <h4><i class="fas fa-info-circle"></i> Informações do Pagamento</h4>
+                        <ul class="info-list">
+                            <li><strong>Nome:</strong> {{ nome }}</li>
+                            <li><strong>Valor:</strong> R$ {{ valor }}</li>
+                            <li><strong>Cidade:</strong> {{ cidade }}</li>
+                            <li><strong>Timestamp:</strong> {{ payload[:20] }}...</li>
+                        </ul>
+                    </div>
+
+                    <div class="usage-instructions">
+                        <h4><i class="fas fa-graduation-cap"></i> Como Usar</h4>
+                        <ol>
+                            <li>Escaneie o QR Code com o app do seu banco</li>
+                            <li>OU copie o código acima e cole no app</li>
+                            <li>Confirme os dados e finalize o pagamento</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="api-response">
+                <h3><i class="fas fa-exchange-alt"></i> Resposta da API</h3>
+                <div class="response-format">
+                    <h4>Formato JSON:</h4>
+                    <pre><code id="json-response">{
+    "success": true,
+    "payload": "{{ payload }}",
+    "data": {
+        "nome": "{{ nome }}",
+        "valor": "{{ valor }}",
+        "cidade": "{{ cidade }}"
+    }
+}</code></pre>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>API PIX QR Code Generator &copy; Snake Project 2026</p>
+            <div class="footer-links">
+                <a href="/api/docs"><i class="fas fa-book"></i> API Docs</a>
+                <a href="/generate"><i class="fas fa-qrcode"></i> Gerar PIX</a>
+                <a href="https://www.bcb.gov.br/pix" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> BCB PIX
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Copiar payload para área de transferência
+        function copyPayload() {
+            const payloadText = document.getElementById('payload-text');
+            payloadText.select();
+            payloadText.setSelectionRange(0, 99999); // Para mobile
+            
+            try {
+                navigator.clipboard.writeText(payloadText.value);
+                alert('Código PIX copiado para a área de transferência!');
+            } catch (err) {
+                // Fallback para navegadores mais antigos
+                document.execCommand('copy');
+                alert('Código copiado!');
+            }
+        }
+
+        // Download do QR Code
+        function downloadQRCode() {
+            const qrImage = document.querySelector('.qr-image');
+            const link = document.createElement('a');
+            
+            if (qrImage.src.startsWith('data:')) {
+                // Para base64
+                link.href = qrImage.src;
+                link.download = 'pix-qrcode-' + Date.now() + '.png';
+            } else {
+                // Para URL
+                link.href = qrImage.src;
+                link.download = qrImage.src.split('/').pop();
+            }
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Compartilhar QR Code (Web Share API)
+        function shareQRCode() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'QR Code PIX',
+                    text: 'Pagamento PIX de R$ {{ valor }} para {{ nome }}',
+                    url: window.location.href
+                })
+                .then(() => console.log('Compartilhado com sucesso'))
+                .catch(error => console.log('Erro ao compartilhar:', error));
+            } else {
+                // Fallback para copiar link
+                copyPayload();
+                alert('Link copiado! Compartilhe com o código PIX.');
+            }
+        }
+
+        // Exibir payload formatado no JSON de exemplo
+        document.addEventListener('DOMContentLoaded', function() {
+            const jsonCode = document.getElementById('json-response');
+            if (jsonCode) {
+                const jsonObj = {
+                    success: true,
+                    payload: "{{ payload }}",
+                    data: {
+                        nome: "{{ nome }}",
+                        valor: "{{ valor }}",
+                        cidade: "{{ cidade }}"
+                    }
+                };
+                jsonCode.textContent = JSON.stringify(jsonObj, null, 2);
+            }
+        });
+    </script>
+</body>
+</html>
